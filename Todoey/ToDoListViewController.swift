@@ -10,7 +10,7 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
 
-    let itemArray = ["Find Mikes","Buy Eggos","Destroy"]
+    var itemArray = ["Find Mikes","Buy Eggos","Destroy"]
     private let cellIdentifier = "ToDoItemCell"
     
     override func viewDidLoad() {
@@ -40,12 +40,35 @@ class ToDoListViewController: UITableViewController {
         let item = itemArray[indexPath.row]
         print(item)
         tableView.deselectRow(at: indexPath, animated: true)
+        
         if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         }else{
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
         }
     }
-
+    
+    // MARK: - Add New Items
+    
+    @IBAction func addNewItems(_ sender: Any) {
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add Item", style: .default) {
+            [unowned self, unowned alert] (action) in
+            guard let text = alert.textFields?.first?.text, !text.isEmpty else {
+                return
+            }
+            self.itemArray.append(text)
+            self.tableView.reloadData()
+        }
+        alert.addTextField {
+            (alertTextFiled) in
+            alertTextFiled.placeholder = "Create New Item"
+            
+            
+        }
+        alert.addAction(action)
+        self.present(alert, animated: true)
+    }
+    
 }
 
