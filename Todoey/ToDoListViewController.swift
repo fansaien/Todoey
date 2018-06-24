@@ -10,7 +10,7 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
 
-    var itemArray = ["Find Mikes","Buy Eggos","Destroy"]
+    var itemArray = [Item]()
     let defaults = UserDefaults.standard
     let defaultsSavingKey = "TodoListArray"
     
@@ -19,8 +19,8 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        if let arr =  defaults.array(forKey: defaultsSavingKey)  as? [String]{
-            itemArray = arr
+        if let decoded =  defaults.object(forKey: defaultsSavingKey)  as? Data{
+            itemArray =  NSKeyedUnarchiver.unarchiveObject(with: decoded) as! [Item]
         }
     }
 
@@ -36,7 +36,8 @@ class ToDoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = itemArray[indexPath.row].title
+        cell.accessoryType = itemArray[indexPath.row].done ? .checkmark : .none
         return cell
     }
     
@@ -49,8 +50,10 @@ class ToDoListViewController: UITableViewController {
         
         if tableView.cellForRow(at: indexPath)?.accessoryType != .checkmark {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            item.done = true
         }else{
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            item.done = false
         }
     }
     
@@ -63,8 +66,10 @@ class ToDoListViewController: UITableViewController {
             guard let text = alert.textFields?.first?.text, !text.isEmpty else {
                 return
             }
-            self.itemArray.append(text)
-            self.defaults.setValue(self.itemArray, forKey: self.defaultsSavingKey)
+            self.itemArray.append(Item(title: text))
+            let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.itemArray)
+            self.defaults.setValue(encodedData, forKey: self.defaultsSavingKey)
+            self.defaults.synchronize()
             self.tableView.reloadData()
         }
         alert.addTextField {
