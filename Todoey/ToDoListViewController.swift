@@ -11,11 +11,17 @@ import UIKit
 class ToDoListViewController: UITableViewController {
 
     var itemArray = ["Find Mikes","Buy Eggos","Destroy"]
+    let defaults = UserDefaults.standard
+    let defaultsSavingKey = "TodoListArray"
+    
     private let cellIdentifier = "ToDoItemCell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        if let arr =  defaults.array(forKey: defaultsSavingKey)  as? [String]{
+            itemArray = arr
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -58,6 +64,7 @@ class ToDoListViewController: UITableViewController {
                 return
             }
             self.itemArray.append(text)
+            self.defaults.setValue(self.itemArray, forKey: self.defaultsSavingKey)
             self.tableView.reloadData()
         }
         alert.addTextField {
