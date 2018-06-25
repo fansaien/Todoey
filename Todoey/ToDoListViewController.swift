@@ -12,16 +12,21 @@ class ToDoListViewController: UITableViewController {
 
     var itemArray = [Item]()
     let defaults = UserDefaults.standard
-    let defaultsSavingKey = "TodoListArray"
+    let defaultsSavingKey = "TodoListArray" 
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     private let cellIdentifier = "ToDoItemCell"
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        if let decoded =  defaults.object(forKey: defaultsSavingKey)  as? Data{
-            itemArray =  NSKeyedUnarchiver.unarchiveObject(with: decoded) as! [Item]
-        }
+        
+        
+        print(dataFilePath!)
+        
+        
+        loadDataFromLocalStorage()
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,6 +46,35 @@ class ToDoListViewController: UITableViewController {
         return cell
     }
     
+    // MARK: - Save to local storage
+    func saveToLocal(){
+        let encoder = PropertyListEncoder()
+        do{
+            let data = try encoder.encode(self.itemArray)
+            try data.write(to: self.dataFilePath!)
+        }catch{
+            print(" Error encoding item error \(error)")
+        }
+    }
+    
+    fileprivate func loadDataFromLocalStorage() {
+        // Do any additional setup after loading the view, typically from a nib.
+        /*
+         if let decoded =  defaults.object(forKey: defaultsSavingKey)  as? Data{
+         itemArray =  NSKeyedUnarchiver.unarchiveObject(with: decoded) as! [Item]
+         }
+         */
+        let decoder = PropertyListDecoder()
+        do{
+            let data = try Data(contentsOf: self.dataFilePath!)
+            
+            let list = try decoder.decode([Item].self, from:data)
+            self.itemArray = list
+        }catch{
+            print("load file error = \(error)")
+        }
+    }
+    
     // MARK: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -55,6 +89,7 @@ class ToDoListViewController: UITableViewController {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
             item.done = false
         }
+        saveToLocal()
     }
     
     // MARK: - Add New Items
@@ -67,9 +102,13 @@ class ToDoListViewController: UITableViewController {
                 return
             }
             self.itemArray.append(Item(title: text))
+            /*
             let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.itemArray)
             self.defaults.setValue(encodedData, forKey: self.defaultsSavingKey)
             self.defaults.synchronize()
+ */
+            // another way to save property object
+            self.saveToLocal()
             self.tableView.reloadData()
         }
         alert.addTextField {

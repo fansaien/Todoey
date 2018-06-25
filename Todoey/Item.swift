@@ -7,13 +7,18 @@
 //
 
 import Foundation
-class Item : NSObject, NSCoding{
+//class Item : NSObject, NSCoding{
+class Item : Codable, CustomStringConvertible {
     var title  = ""
     var done = false
     init(title : String, done : Bool = false) {
         self.title = title
         self.done = done
     }
+    var description: String {
+        return "[title] = \(title) , done = \(done)"
+    }
+    /*
     required convenience init(coder aDecoder: NSCoder) {
         let title = aDecoder.decodeObject(forKey: "title") as! String
         let done = aDecoder.decodeBool(forKey: "done")
@@ -24,4 +29,6 @@ class Item : NSObject, NSCoding{
         aCoder.encode(title, forKey: "title")
         aCoder.encode(done, forKey: "done")
     }
+     */
+
 }
