@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController {
 
@@ -14,6 +15,7 @@ class ToDoListViewController: UITableViewController {
     let defaults = UserDefaults.standard
     let defaultsSavingKey = "TodoListArray" 
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     private let cellIdentifier = "ToDoItemCell"
     
@@ -48,12 +50,19 @@ class ToDoListViewController: UITableViewController {
     
     // MARK: - Save to local storage
     func saveToLocal(){
+        /*
         let encoder = PropertyListEncoder()
         do{
             let data = try encoder.encode(self.itemArray)
             try data.write(to: self.dataFilePath!)
         }catch{
             print(" Error encoding item error \(error)")
+        }
+ */
+        do{
+           try self.context.save()
+        }catch{
+             print(" Error encoding item error \(error)")
         }
     }
     
@@ -64,6 +73,7 @@ class ToDoListViewController: UITableViewController {
          itemArray =  NSKeyedUnarchiver.unarchiveObject(with: decoded) as! [Item]
          }
          */
+        /*
         let decoder = PropertyListDecoder()
         do{
             let data = try Data(contentsOf: self.dataFilePath!)
@@ -72,6 +82,12 @@ class ToDoListViewController: UITableViewController {
             self.itemArray = list
         }catch{
             print("load file error = \(error)")
+        }
+ */
+        do{
+            self.itemArray = try context.fetch(Item.fetchRequest())
+        }catch{
+            print(error)
         }
     }
     
@@ -101,7 +117,10 @@ class ToDoListViewController: UITableViewController {
             guard let text = alert.textFields?.first?.text, !text.isEmpty else {
                 return
             }
-            self.itemArray.append(Item(title: text))
+            let item = Item(context: self.context)
+            item.title = text
+            item.done = false
+            self.itemArray.append(item)
             /*
             let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.itemArray)
             self.defaults.setValue(encodedData, forKey: self.defaultsSavingKey)
