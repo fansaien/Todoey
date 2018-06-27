@@ -9,13 +9,19 @@
 import UIKit
 import CoreData
 
-class ToDoListViewController: UITableViewController {
+class ToDoListViewController: UITableViewController, UISearchBarDelegate {
 
+    @IBOutlet weak var searchBar: UISearchBar!
     var itemArray = [Item]()
     let defaults = UserDefaults.standard
     let defaultsSavingKey = "TodoListArray" 
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var selectedCategory : Category? {
+        didSet{
+            self.loadItems()
+        }
+    }
     
     private let cellIdentifier = "ToDoItemCell"
     
@@ -24,11 +30,13 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        searchBar.delegate = self
         print(dataFilePath!)
         
         
-        loadDataFromLocalStorage()
+//        loadDataFromLocalStorage()
+       
+        //self.navigationController?.hidesBarsOnTap = true
     }
 
     override func didReceiveMemoryWarning() {
@@ -84,8 +92,19 @@ class ToDoListViewController: UITableViewController {
             print("load file error = \(error)")
         }
  */
+        self.loadItems(with: Item.fetchRequest())
+    }
+    
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()){
+        let predicate = NSPredicate(format: "parentCategory.name = %@", self.selectedCategory!.name!)
+        if let orignPredicate =  request.predicate {
+            let predictCompound = NSCompoundPredicate(andPredicateWithSubpredicates: [orignPredicate,predicate])
+            request.predicate = predictCompound
+        }else{
+            request.predicate = predicate
+        }
         do{
-            self.itemArray = try context.fetch(Item.fetchRequest())
+            self.itemArray = try context.fetch(request)
         }catch{
             print(error)
         }
@@ -120,6 +139,7 @@ class ToDoListViewController: UITableViewController {
             let item = Item(context: self.context)
             item.title = text
             item.done = false
+            item.parentCategory = self.selectedCategory!
             self.itemArray.append(item)
             /*
             let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.itemArray)
@@ -138,6 +158,42 @@ class ToDoListViewController: UITableViewController {
         }
         alert.addAction(action)
         self.present(alert, animated: true)
+    }
+    
+    // MARK: - Search Bar
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let text = searchBar.text!
+        if text.isEmpty {
+            self.loadDataFromLocalStorage()
+            self.tableView.reloadData()
+            return
+        }
+        let reqeust :NSFetchRequest<Item> = Item.fetchRequest()
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", text)
+        reqeust.predicate = predicate
+        reqeust.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        self.loadItems(with: reqeust)
+        self.tableView.reloadData()
+    }
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.searchBar.endEditing(true)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text!.isEmpty {
+            self.loadDataFromLocalStorage()
+            
+            DispatchQueue.main.async {
+                [unowned self] in
+                self.tableView.reloadData()
+                searchBar.resignFirstResponder()
+            }
+ 
+//            self.tableView.reloadData()
+//            searchBar.resignFirstResponder()
+            
+            return
+        }
     }
     
 }

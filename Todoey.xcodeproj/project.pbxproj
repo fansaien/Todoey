@@ -13,6 +13,7 @@
 		A6B2E74B20DC643500021B18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A6B2E74A20DC643500021B18 /* Assets.xcassets */; };
 		A6B2E74E20DC643500021B18 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A6B2E74C20DC643500021B18 /* LaunchScreen.storyboard */; };
 		A6E8B3D520E0961D00640B38 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A6E8B3D320E0961D00640B38 /* DataModel.xcdatamodeld */; };
+		A6E8B3F820E2EF5F00640B38 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E8B3F720E2EF5F00640B38 /* CategoryTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		A6B2E74D20DC643500021B18 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A6B2E74F20DC643500021B18 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A6E8B3D420E0961D00640B38 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		A6E8B3F720E2EF5F00640B38 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				A6B2E74520DC643200021B18 /* ToDoListViewController.swift */,
+				A6E8B3F720E2EF5F00640B38 /* CategoryTableViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -173,6 +176,7 @@
 				A6E8B3D520E0961D00640B38 /* DataModel.xcdatamodeld in Sources */,
 				A6B2E74620DC643200021B18 /* ToDoListViewController.swift in Sources */,
 				A6B2E74420DC643200021B18 /* AppDelegate.swift in Sources */,
+				A6E8B3F820E2EF5F00640B38 /* CategoryTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
